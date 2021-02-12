@@ -14,12 +14,34 @@ const scrap = async () => {
     await page.goto('https://unogs.com/search/matrix', { waitUntil: 'domcontentloaded' });
 
     // eval will extract the rows from the table
-    const recordList = await page.$$eval('body div.results ', (results) => {
-        // results.shift();
-        let resultList = [];
-        let x = 6;
-        itemlistdiv = results[0].querySelector('.listdiv');
-        itemlist = itemlistdiv.querySelectorAll('div');
+    import React, {useState} from 'react';
+
+    const SearchBar = () => {
+    
+        const [searchVal, setSearchVal] = useState("");
+    
+        const handleSearchInput = (e) => {
+            setSearchVal(e.target.value);
+        }
+    
+        const callSearchFunction = (e) => {
+            e.preventDefault();
+            setSearchVal("");
+        }
+    
+        return ( 
+            <form className="search">
+            <input
+              value={searchVal}
+              onChange={handleSearchInput}
+              type="text"
+            />
+            <input onClick={callSearchFunction} type="submit" value="SEARCH" />
+          </form>
+        );
+    }
+     
+    export default SearchBar;
         // results.forEach(result => {
             // let record = { imgSrc: '', movieName: '', movieDescription: '', countriesList: [] }
             // const item = result.querySelector('div');
@@ -73,3 +95,5 @@ scrap();
 //     console.log("app is running on port 5050");
 //     convert();
 // });
+
+
