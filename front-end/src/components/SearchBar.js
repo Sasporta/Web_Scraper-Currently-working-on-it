@@ -2,21 +2,21 @@ import React, {useState} from 'react';
 
 const SearchBar = () => {
 
-    const [searchVal, setSearchVal] = useState("");
+    const [search, setSearch] = useState("");
 
     const handleSearchInput = (e) => {
-        setSearchVal(e.target.value);
+        setSearch(e.target.value);
     }
 
     const callSearchFunction = (e) => {
         e.preventDefault();
-        setSearchVal("");
+        setSearch("");
     }
 
     return ( 
         <form className="search">
         <input
-          value={searchVal}
+          value={search}
           onChange={handleSearchInput}
           type="text"
         />
