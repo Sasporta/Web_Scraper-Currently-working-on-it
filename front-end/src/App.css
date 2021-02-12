@@ -1,0 +1,47 @@
+
+body{
+  height: 100%;
+}
+.search {
+  margin-left: auto;
+  text-align: center;
+  background-color: transparent;
+  border: none;
+  border-radius: 0;
+  outline: none;
+  height: 3rem;
+  width: 100%;
+  font-size: 16px;
+  margin: 0 0 8px 0;
+  padding: 0;
+  }
+
+  .OuterContainer{
+    border-radius: 10px;
+    position: relative;
+    height: 1000px;
+    width: 100%;
+    background-color: #eee;
+    border: 1px solid#999;
+    padding: 10px;
+    color: #000;
+    text-align: left;
+    font-size: 14px;
+    cursor: pointer;
+    display: flex;
+    /* justify-content: space-around; */
+    flex-wrap: wrap;
+    flex-direction: column-reverse;
+  }
+
+  .inner-container{
+    border: 1px solid black;
+    padding: 10px;
+    height: min-content;
+    margin: 5px;
+  }
+
+  .jackie{
+    width: 166px;
+    height: 100px;
+  }
