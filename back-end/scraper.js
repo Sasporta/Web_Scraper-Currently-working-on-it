@@ -1,74 +1,63 @@
 const puppeteer = require('puppeteer');
 // const app = require('express')();
-// const fs = require('fs');
+const fs = require('fs');
 
 // scraping for the key words:
 
-const scrap = async () => {
+(scrap = async () => {
+    // wanted url
+    const url = 'https://unogs.com/search/matrix'
     //browser initiate
-    const browser = await puppeteer.launch({ headless: false });
+    const browser = await puppeteer.launch({ headless: false });  // { headless: false }
     // opening a new blank page
     const page = await browser.newPage();
     // navigate to url and wait until page loads completely 
     // await page.goto('https://unogs.com/search/:searchContent', { waitUntil: 'domcontentloaded' });
-    await page.goto('https://unogs.com/search/matrix', { waitUntil: 'domcontentloaded' });
+    await page.goto(url, { waitUntil: 'networkidle2' });
 
-    // eval will extract the rows from the table
-    const recordList = await page.$$eval('body div.results ', (results) => {
-        // results.shift();
-        let resultList = [];
-        let x = 6;
-        itemlistdiv = results[0].querySelector('.listdiv');
-        itemlist = itemlistdiv.querySelectorAll('div');
-        // results.forEach(result => {
-            // let record = { imgSrc: '', movieName: '', movieDescription: '', countriesList: [] }
-            // const item = result.querySelector('div');
-            // record.imgSrc = result.querySelector('img').src;
-            // resultList.push(result.className)
-            // x = result.className;
-            // assaf
+    // evaluate will run the code inside its function as if it was on the browser
+    const resultList = await page.evaluate(() => {
+        const resultsArray = [];
+        [...document.querySelectorAll('div[class="videodiv img-rounded"]')].forEach(result => {
+            const resultName = result.querySelectorAll('div')[2].querySelector('b > span').innerText;
+            const resultImgUrl = result.querySelector('img').src;
+            const resultDesc = result.querySelectorAll('div')[2].querySelectorAll('span')[3].innerText;
+
+            const resultInfo = {
+                name: resultName,
+                imgUrl: resultImgUrl,
+                desc: resultDesc,
+            };
+            resultsArray.push(resultInfo);
+        });
+        return resultsArray;
+    });
+
+    await page.click('div[class="sclist img-rounded"]');
+    await page.waitForSelector('div[class="sclist img-rounded"]');
+    const contriesList = await page.evaluate(() => {
+        const VpnCountriesDivList = document.querySelectorAll('div[class="img-rounded clistdiv"]');
+        const VpnCountriesNameAndImgList = [...VpnCountriesDivList].map(span =>
+            ({
+                countysName: span.querySelector('span').innerText,
+                countysFlag: span.querySelector('img').src
+            }));
+        return [...VpnCountriesDivList];
+    });
+    console.log(contriesList);
+    await browser.close();
+
+    const data = resultList.map(result => ({ ...result, vpnCountries: "contriesList" }));
 
 
-            // // saving the rows number
-            // let rowNumber = null;
-
-            // if (tdList[0].dataset.lineNumber && !tdList[1].dataset.lineNumber) {
-            //     rowNumber = tdList[0].dataset.lineNumber;
-            // } else if (tdList[1].dataset.lineNumber && !tdList[0].dataset.lineNumber) {
-            //     rowNumber = tdList[1].dataset.lineNumber;
-            // } else if (tdList[0].dataset.lineNumber && tdList[1].dataset.lineNumber) {
-            //     tdList[0].dataset.lineNumber > tdList[1].dataset.lineNumber ? rowNumber = tdList[0].dataset.lineNumber : rowNumber = tdList[1].dataset.lineNumber
-            // }
-
-            // // finding the wanted string and saving both the string and its row number
-            // const spanList = tdList[1].querySelectorAll('span');
-            // const ToTranslate = [];
-            // spanList.forEach((element, index, array) => {
-            //     const matchWord = 'function';
-            //     if (element.innerText && element.innerText.includes(matchWord)) {
-            //         ToTranslate.push(array[index + 1].innerText);
-            //     }
-            // });
-
-            // if (ToTranslate.length > 0) {
-            //     record.Line = rowNumber;
-            //     record.TextToTranslate = ToTranslate[0];
-            //     rowList.push(record);
-            // };
-        // });
-        // return rowList;
-        return itemlist[0].className;
-    })
-    console.log(recordList);
-    browser.close();
 
     // creating the json file
-    // fs.writeFile('scraper-data.json', JSON.stringify(recordList, null, 2), (err) => {
-    //     if (err) { console.log(err) }
-    //     else { console.log('Saved Successfully!') }
-    // })
-};
-scrap();
+    fs.writeFile('data.json', JSON.stringify(data, null, 2), (err) => {
+        if (err) { console.log(err) }
+        else { console.log('Saved Successfully!') }
+    })
+})();
+
 
 // app.listen(5050, () => {
 //     console.log("app is running on port 5050");
